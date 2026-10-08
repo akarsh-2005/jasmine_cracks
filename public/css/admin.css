@@ -63,3 +63,6 @@ dialog{border:0;border-radius:14px;padding:24px;max-width:520px;width:92vw;box-s
 dialog a{color:#8a6410}
 #toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,220%);background:var(--navy);color:#fff;border-left:4px solid var(--gold);padding:12px 18px;border-radius:10px;transition:.3s;z-index:90;max-width:92vw}#toast.o{transform:translate(-50%,0)}#toast.e{border-color:#ff7a70}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.cs{font-size:.8rem;line-height:1.45;margin:12px 0 0;padding:8px 10px;border-radius:8px;text-align:left;background:rgba(255,255,255,.08);color:#cfd6e6}
+.cs.ok{background:rgba(31,157,85,.18);color:#bff0d2}.cs.bad{background:rgba(196,32,47,.22);color:#ffd5da}

@@ -90,3 +90,10 @@ Push this folder to GitHub → vercel.com → **Add New Project** → import →
 **Redeploy the backend (important):** open Apps Script, replace `Code.gs` with the new one, then *Deploy > Manage deployments > pencil icon > Version: New version > Deploy*. The web app URL stays the same. Then run `setupKeepWarm()` once from the editor (optional, keeps the server warm, runs every 5 minutes).
 **Why the admin was slow:** the password check ran 2000 separate Google service calls (several seconds), every admin action waited in a queue (lock) even when only reading, and the dashboard re-read the whole order history. All three are fixed, sign-in now returns the dashboard in the same request, and the page wakes the server while the login form is being filled in.
 **New for customers:** sideways-scrolling product list, an *All Products* page with prices and quick add-to-cart, *My Orders* (only for orders the customer chooses to save on their own device), a copy button for the Order ID, and notices that payment is made directly with the shop, not on the website.
+
+## If the admin is slow or will not connect
+The admin sign-in page shows a status line under the button:
+- **Green “Server connected”**: everything is fine.
+- **Red “old version”**: Google is still running the OLD `Code.gs` (very slow sign-in). Fix: Apps Script > paste the new `Code.gs` > Save > **Deploy > Manage deployments > pencil icon > Version: New version > Deploy**. Saving alone does NOT update the live web app.
+- **Red “cannot reach the server”**: Deploy settings must be *Execute as: Me* and *Who has access: Anyone*.
+Quick test: open `YOUR_WEB_APP_URL?action=ping` in a browser. It must show `"success":true` and `"v":3`.

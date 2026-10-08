@@ -339,7 +339,7 @@ function bustPublic() { try { cache().remove(PUB_KEY); } catch (x) { /* ignore *
 function doGet(e) {
   try {
     const act = ((e && e.parameter) || {}).action;
-    if (act === 'ping') { tab(SH.O); return out(true, { t: Date.now() }, 'OK'); }   // wakes the server before the admin signs in
+    if (act === 'ping') { tab(SH.O); return out(true, { t: Date.now(), v: 3 }, 'OK'); }   // wakes the server before the admin signs in
     if (act !== 'products') throw fail('Unknown action');
     return out(true, publicProducts(), 'OK');
   } catch (err) { return errOut(err); }

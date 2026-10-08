@@ -12,21 +12,38 @@ let token = null, D = { products: [], orders: [], stats: {} }, view = "dash", ed
 try { token = sessionStorage.getItem(TK) } catch (e) {}
 
 function toast(m, e) { const t = $("#toast"); t.textContent = m; t.className = "o" + (e ? " e" : ""); clearTimeout(t.t); t.t = setTimeout(() => t.className = "", 3800) }
-try { fetch(URL_ + (URL_.includes("?") ? "&" : "?") + "action=ping&t=" + Date.now(), { mode: "no-cors" }) } catch (e) {}   // wake the server while the login form is being filled in
-function waking(n) { const b = $("#lb"), m = document.querySelector("#app .msg"); const t = "The server is waking up. Please wait a moment…"; if (b && b.disabled) b.textContent = t; if (m && loadState === "loading") m.innerHTML = '<span class="spin"></span>' + t }
+function tick(t0) { const n = Math.round((Date.now() - t0) / 1000), b = $("#lb"), m = document.querySelector("#app .msg");
+  if (b && b.disabled) b.textContent = n < 4 ? "Signing in…" : `Signing in… ${n} s`;
+  if (m && loadState === "loading") m.innerHTML = '<span class="spin"></span>' + (n < 4 ? "Loading your dashboard…" : `Connecting to the server… ${n} s. The first load can take a moment.`) }
+let srv = "wait";   // wait | ok | old | down: what the connection check found
+async function checkServer() {
+  const el = $("#cs"); if (!el || !URL_) return; const t0 = Date.now(), set = (c, h) => { el.className = "cs " + c; el.innerHTML = h };
+  const iv = setInterval(() => { if (srv === "wait") set("wait", `Connecting to the server… ${Math.round((Date.now() - t0) / 1000)} s`) }, 1000); set("wait", "Connecting to the server…");
+  for (let n = 0; n < 3; n++) {
+    const ac = new AbortController(), to = setTimeout(() => ac.abort(), 25000);
+    try {
+      const j = await (await fetch(URL_ + (URL_.includes("?") ? "&" : "?") + "action=ping&t=" + Date.now(), { signal: ac.signal })).json(); clearTimeout(to); clearInterval(iv);
+      if (j.success) { srv = "ok"; set("ok", `✓ Server connected (${((Date.now() - t0) / 1000).toFixed(1)} s)`) }
+      else { srv = "old"; set("bad", "⚠ The Google server is still running an <b>old version</b> of the code. That is why sign-in is slow. The website developer must deploy the new <b>Code.gs</b> as a <b>New version</b> (README, “If the admin is slow”).") }
+      return;
+    } catch (e) { clearTimeout(to) }
+  }
+  clearInterval(iv); srv = "down"; set("bad", "✗ Cannot reach the server. Check your internet connection. If it keeps happening, the Google deployment must be set to “Execute as: Me” and “Who has access: Anyone”.");
+}
+checkServer();
 async function api(action, data = {}, ms = 45000) {
-  const safe = action === "dashboard" || action === "login"; let last;      // reads and sign-in can be repeated safely; writes are never repeated
-  for (let n = 0; n < (safe ? 3 : 1); n++) {
-    try { return await api1(action, data, safe ? 30000 : ms) } catch (e) { last = e; if (!e.net) throw e; waking(n + 1) }
+  const safe = action === "dashboard"; let last;                              // only reading is repeated; sign-in is never repeated, so slow requests cannot pile up
+  for (let n = 0; n < (safe ? 2 : 1); n++) {
+    try { return await api1(action, data, action === "login" ? 60000 : safe ? 40000 : ms) } catch (e) { last = e; if (!e.net) throw e }
   }
   throw last;
 }
 async function api1(action, data = {}, ms = 45000) {
   if (!URL_) throw new Error("The Google Apps Script URL is not set in js/site-config.js.");
-  const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms); let j;
+  const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms), t0 = Date.now(), iv = (action === "login" || action === "dashboard") ? setInterval(() => tick(t0), 1000) : 0; let j;
   try { j = await (await fetch(URL_, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action, token, ...data }), signal: ac.signal })).json() }
-  catch (e) { const x = new Error("Could not reach the server. Check your internet connection and try again."); x.net = 1; throw x }
-  finally { clearTimeout(t) }
+  catch (e) { const x = new Error(e && e.name === "AbortError" ? "The server took too long to answer. Please wait a minute and try once more." : "Could not reach the server. Check your internet connection and try again."); x.net = 1; throw x }
+  finally { clearTimeout(t); clearInterval(iv) }
   if (!j.success) { if (j.code === "AUTH") toLogin(j.message); const e = new Error(j.message || "Something went wrong. Please try again."); e.code = j.code; throw e }
   return j.data;
 }
