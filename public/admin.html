@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Admin | Jasmine Crackers</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css"></head><body>
+<section id="login" class="lg" hidden><form id="lf" class="lgc" novalidate>
+<img src="images/logo.jpg" alt="" width="64" height="64"><h1>Jasmine Crackers</h1><p class="sub">Admin sign-in</p><p class="sub" style="font-size:.82rem;line-height:1.45;margin:-4px 0 10px"><b>Authorised shop staff only.</b> Customers do not need to sign in here. Repeated wrong attempts will lock this login for a while.</p>
+<label>Username<input id="lu" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+<label>Password<input id="lp" type="password" autocomplete="current-password"></label>
+<p id="le" class="er" role="alert"></p><button class="btn p" id="lb" type="submit">Sign in</button></form></section>
+
+<div id="shell" hidden>
+<header class="mob"><b>JASMINE CRACKERS ADMIN</b><button class="btn s sm" data-out>Sign out</button></header>
+<aside class="side"><div class="brand"><img src="images/logo.jpg" alt="" width="40" height="40"><div><b>JASMINE CRACKERS</b><small>ADMIN</small></div></div>
+<nav id="nav"><button data-v="dash">Dashboard</button><button data-v="orders">Orders</button><button data-v="products">Products</button><button data-v="form">Add product</button><button data-v="account">Account</button></nav>
+<button class="btn s out" data-out>Sign out</button></aside>
+<main id="app"></main></div>
+
+<dialog id="dlg"><h3 id="dt"></h3><div id="db"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="js/site-config.js"></script><script src="js/admin.js"></script>
+</body></html>
